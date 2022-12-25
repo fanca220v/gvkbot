@@ -12,7 +12,7 @@ function vkapi:RunMethod(bot, method, req, func)
 
 	local request = method .. "?v=".. api_version .."".. req_str
 	http.Post(
-		'https://api.vk.com/method/'.. request,
+		string.gsub('https://api.vk.com/method/'.. request, "%s+", "%%20"),
 		req,  -- вк просто отказывается видеть эту дрянь(POST), временно через url работает
 		function(data,len,head,code)
 			if (func) then
