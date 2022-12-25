@@ -1,11 +1,11 @@
 local over_admin = {
-	[230438837] = true -- ID ADMINS
+	[230438837] = true
 }
 local bot = vkapi.bot:Create(
 	"server", -- UID
-	"<TOKEN>" -- TOKEN
+	"vk1.a.xxx" --TOKEN
 )
-bot:StartPoll()
+bot:Start()
 
 local isadmin = function(msg)
 	return over_admin[msg.from_id]||false
@@ -24,6 +24,28 @@ else
 	bot:error('engine spew отсутствует на сервере')
 end
 
+bot:Command('/getmsg', function(msg,args,str,chat)
+	local m = vkapi.method('messages.getById',bot)
+	:SetFunction(function(data,r)
+		data = istable(data) && data.response || {}
+		if (data.error) then return "Сообщение не существует." end
+		if (!data) || (!data.items) || (!data.items[1]) then return "Сообщение не существует." end
+		bot:SendMessage(msg.peer_id, "Вот", data.items[1].id||msg:ID(), function(d)
+			if (d.error) then
+				if(string.find(tostring(d.error_msg), "reply_to have to be message from same chat")) then
+					msg:Reply('Сообщение не существует в этом чате.\n\n'.. util.TableToJSON(data))
+					return true
+				else
+					msg:Reply('Сообщение нельзя выделить.\n\n'.. util.TableToJSON(data))
+					return true
+				end
+			end
+		end)
+	end)
+	:SetMessages(args[1])
+	:SetChat(msg:GetChat())
+	:Run()
+end)
 bot:Command('/json', function(msg,args,str,chat)
 	-- PrintTable(msg)
 	return util.TableToJSON(args[1]=="chat" && chat || msg,true)
@@ -38,9 +60,11 @@ end)
 bot:Command('/status', function(msg,args,str,chat)
 	return string.format([[
 %s 🤙:
+
 ✊ Игроки: %s/%s
 🗻 Карта: %s
 🔥 Бот uid: %s
+
 ЗАЙТИ 👉 %s
 	]], GetHostName(), #player.GetAll(), game.MaxPlayers(), game.GetMap(), bot:GetClass(), game.GetIPAddress())
 end)
@@ -53,6 +77,7 @@ bot:Command('/cmd', function(msg,args,str,chat)
 	str = string.Replace(str, " ".. args[1], "")
 	msg:Reply(string.format([[
 🤙 Выпоняю команду "%s" с аргументами "%s"
+
 return:
 %s -- soon enginespew
 	]], args[1], str, "- Нету"))
@@ -65,6 +90,7 @@ bot:Command('/lua', function(msg,args,str,chat)
 	RunString(str)
 	msg:Reply(string.format([[
 Выпоняю код🤙:
+
 %s
 	]], str))
 end)
@@ -89,3 +115,12 @@ bot:Command('/anonc', function(msg,args,str,chat)
 	bot:print('АНОНС ВСЕМ В СООБЩЕНИЯ:\n'.. str)
 	-- return 'Отправлено всем: '.. str
 end)
+
+function bot:GetVKUser(id,p,func)
+	if isfunction(p) then func=p end
+	local m = vkapi.method('users.get',bot)
+	:Add('name_case', p||'nom')
+	:SetFunction(func)
+	:SetUsers(id)
+	:Run()
+end

@@ -38,7 +38,6 @@ https://github.com/fanca220v/gvkbot
 			vkapi:print(Color(0,255,0), [[actual version.]])
 		end
 	end)
-	-- self:Include("core/bots.lua")
 end
 hook.Add('serv.fullload', 'vkapi.load', function()
 	vkapi:Load()
@@ -49,7 +48,7 @@ end)
 if (!serv) then
 
 timer.Simple(.1, function()
-	hook.Run('serv.fullload')
+	hook.Run('serv.fullload') -- SteamIHTTP fix
 end)
 
 end

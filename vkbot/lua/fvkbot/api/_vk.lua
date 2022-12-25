@@ -1,5 +1,5 @@
 local api_version = 5.131
-function vkapi:RunMethod(bot, method, req, func)
+function vkapi:RunMethod(bot, method, req, func, ffunc)
 	req = req || {}
 	req.v = api_version
 	req.access_token = bot && bot:GetToken() || "???"
@@ -13,13 +13,18 @@ function vkapi:RunMethod(bot, method, req, func)
 	local request = method .. "?v=".. api_version .."".. req_str
 	http.Post(
 		string.gsub('https://api.vk.com/method/'.. request, "%s+", "%%20"),
-		req,  -- вк просто отказывается видеть эту дрянь(POST), временно через url работает
+		req,
 		function(data,len,head,code)
 			if (func) then
 				local json = util.JSONToTable(data)
 				func(json || data,len,head,code,req)
 			end
 		end,
-		function()  end
+		function(err)
+			if (ffunc) then
+				local json = util.JSONToTable(data)
+				ffunc(json || data,len,head,code,req)
+			end
+		end
 	)
 end

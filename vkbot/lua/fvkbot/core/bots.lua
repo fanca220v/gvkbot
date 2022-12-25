@@ -1,20 +1,23 @@
 local prefix=""
 
 local message_funcs = function(bot,msg)
-	function msg:Reply(text)
-		bot:SendMessage(self.peer_id, text, self.id, function(data)
-			if data.error then
-				PrintTable(data)
-			end
-		end)
+	function msg:ID()
+		return msg.id
+	end
+	function msg:ChatID()
+		return msg.peer_id
+	end
+	msg.GetChat=msg.ChatID
+	function msg:Reply(text,func)
+		bot:SendMessage(self.peer_id, text, self.id, func)
 	end
 	function msg:Remove()
-		bot:Method("messages.delete", {
-			message_ids = self.id,
-			-- cmids = self.id,
-			peer_id = self.peer_id,
-			delete_for_all = 0
-		}, function(data) PrintTable(data) end)
+		local m = vkapi.method('messages.delete'):SetBot(self)
+		:SetBot(bot)
+		:Add('delete_for_all', 1)
+		:SetMessages(self.id)
+		:SetChat(self.peer_id)
+		:Run()
 	end
 	return msg
 end
@@ -45,11 +48,13 @@ function vkapi.bot:Create(uid, token)
 		self._cmds[cmd](...)
 	end
 
-	function bot:StartPoll()
+	function bot:Start()
 		self._ispoll = true
+		self:print"Получение сообщений: Включено"
 	end
-	function bot:StopPoll()
+	function bot:Stop()
 		self._ispoll = nil
+		self:print"Получение сообщений: Выключено"
 	end
 
 	bot._uid = uid || "main"
@@ -82,16 +87,19 @@ function vkapi.bot:Create(uid, token)
 	function bot:Method(method, req, func)
 		vkapi:RunMethod(self, method, req, func)
 	end
-	function bot:SendMessage(chat_id, msg, replyto, func)
-		self:Method('messages.send', 
-			{
-				peer_id = chat_id,
-				reply_to= replyto,
-				random_id=math.random(-2147483648, 2147483647),
-				message = tostring(msg)
-			},
-			function(data) if func then func(data) end end
-		)
+	function bot:SendMessage(chat_id, msg, replyto, ffff)
+		local result = false
+		local m = vkapi.method('messages.send'):SetBot(self)
+		:SetMessage(msg||"<no text> :/")
+		:SetChat(chat_id)
+		:Reply(replyto)
+		:RandomID()
+		:SetFunction(function(d,m)
+			result = {d,m}
+			return ffff && isfunction(ffff) && ffff(d,m) || nil
+		end)
+		:Run()
+		return result
 	end
 
 	function bot:OnMessage(msg, chat)
