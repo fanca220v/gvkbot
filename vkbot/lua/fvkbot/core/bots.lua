@@ -2,10 +2,10 @@ local prefix=""
 
 local message_funcs = function(bot,msg)
 	function msg:ID()
-		return msg.id
+		return self.id
 	end
 	function msg:ChatID()
-		return msg.peer_id
+		return self.peer_id
 	end
 	msg.GetChat=msg.ChatID
 	function msg:Reply(text,func)
