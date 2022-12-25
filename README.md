@@ -13,4 +13,4 @@ VK Bot Api for garry's mod
 3. Заходим в файл бота и ставим ваш токен группы вк.
 4. Готово.
 
-[id]: Pw2RiJWoBu.png "Пример"
+![example](https://github.com/fanca220v/gvkbot/blob/main/Pw2RiJWoBu.png)
