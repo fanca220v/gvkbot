@@ -4,6 +4,12 @@ local message_funcs = function(bot,msg)
 	function msg:ID()
 		return self.id
 	end
+	function msg:FromID()
+		return self.from_id
+	end
+	function msg:IsReply()
+		return (self.reply_message && self.reply_message) || self, (self.reply_message && true) || false
+	end
 	function msg:ChatID()
 		return self.peer_id
 	end
@@ -26,6 +32,7 @@ vkapi.bot = setmetatable({},{})
 vkapi.bots = {}
 function vkapi.bot:Create(uid, token)
 	local bot = setmetatable({},{})
+	LOADING_BOT = bot
 	-------------------------------------
 	function bot:print(...)
 		vkapi:print('[BOT - "'.. self:Name() ..'"] ', Color(255,255,255), ...)
@@ -35,19 +42,45 @@ function vkapi.bot:Create(uid, token)
 	end
 
 	bot._cmds = {
-		['/author'] = function(m) return "https://swaaag.site/fanca.xyz" end
+		['/author'] = {
+			func = function(m) return "https://swaaag.site/fanca.xyz" end,
+			acs = function()return true end,
+			args = "",
+			desc = "Автор бота"
+		},
+		['Команды'] = {
+			func = function(m) 
+				local str = "👀 Команды:\n"
+				for k,v in pairs(bot._cmds) do
+					if(isfunction(v.acs) && v.acs(m)==false)then continue end
+					str = str .."\n".. k .." ".. tostring(v.args) ..(v.desc && " - ".. tostring(v.desc) || "")
+				end
+				return str
+			end,
+			acs = function()return true end,
+			args = "",
+			desc = "Все доступные для вас команды"
+		},
 	}
-	function bot:Command(cmd,func)
-		self._cmds[prefix .. cmd] = func
-		self:print(' Add command "'.. cmd ..'"')
+	function bot:Command(cmd,func,acs,args,desc)
+		self._cmds[prefix .. cmd] = {
+			func= func,
+			acs = acs || function() return true end,
+			args= args|| "",--"<без аргументов>",
+			desc= desc|| false
+		}
+		self:print('Add command "'.. cmd ..'"')
+	end
+	function bot:CommandCopy(to,from)
+		self._cmds[to] = self._cmds[from]
 	end
 	function bot:RemoveCommand(cmd)
 		self._cmds[cmd] = nil
-		self:print(' Remove command "'.. cmd ..'"')
+		self:print('Remove command "'.. cmd ..'"')
 	end
 	function bot:RunCommand(cmd, ...)
-		if (!self._cmds[cmd] || !isfunction(self._cmds[cmd])) then return end
-		self._cmds[cmd](...)
+		if (!self._cmds[cmd] || !isfunction(self._cmds[cmd].func)) then return end
+		self._cmds[cmd].func(...)
 	end
 
 	function bot:Start()
@@ -85,6 +118,22 @@ function vkapi.bot:Create(uid, token)
 	function bot:SetToken(t)
 		self._token = t
 	end
+
+	bot.modules = {}
+	function bot:Module(n)
+		if (!file.Exists('fvkbot/bots/modules/'.. n .."/init.lua", "LUA")) then
+			self:print('module "'.. string.upper(n) ..'" not found')
+			return
+		end
+		-- self:print('module "'.. n ..'" loading...')
+		local res = vkapi:Include('bots/modules/'.. n .."/init.lua")
+		self:print('module "'.. string.upper(n) ..'" loaded')
+		self.modules[n]=res
+		return res
+	end
+	function bot:GetModule(n)
+		return self.modules[n]||false
+	end
 	-------------------------------------
 	function bot:Method(method, req, func)
 		vkapi:RunMethod(self, method, req, func)
@@ -111,7 +160,9 @@ function vkapi.bot:Create(uid, token)
 		if (cmd) then
 			local fulltext = string.sub(msg.text, string.len(args[1])+1)
 			table.remove(args, 1)
-			return cmd(message_funcs(self,msg),args,fulltext,chat)
+			msg = message_funcs(self,msg)
+			if (!cmd.func || !isfunction(cmd.func) || (isfunction(cmd.acs) && cmd.acs(msg)==false)) then return function()end end
+			return cmd.func(msg,args,fulltext,chat)
 		end
 		return [[Это не команда.]]
 	end

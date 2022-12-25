@@ -3,13 +3,16 @@ local over_admin = {
 }
 local bot = vkapi.bot:Create(
 	"server", -- UID
-	"vk1.a.xxx" --TOKEN
+	"vk1.a.xxxxx" --TOKEN
 )
 bot:Start()
+local database = bot:Module('database')
+local sync = bot:Module('steam_sync')
 
 local isadmin = function(msg)
 	return over_admin[msg.from_id]||false
 end
+bot.IsAdmin = isadmin
 local isattachment = function(msg)end
 
 local enginespew = ""
@@ -45,18 +48,18 @@ bot:Command('/getmsg', function(msg,args,str,chat)
 	:SetMessages(args[1])
 	:SetChat(msg:GetChat())
 	:Run()
-end)
+end, isadmin, "<msgid>", "Пингануть сообщение в этомчате по айди, либо получить о нем информацию")
 bot:Command('/json', function(msg,args,str,chat)
 	-- PrintTable(msg)
 	return util.TableToJSON(args[1]=="chat" && chat || msg,true)
-end)
+end, nil, "<chat>", "json сообщения/чата")
 bot:Command('/ping', function(msg,args,str,chat)
 	return "🤙 ".. bot:GetClass()
-end)
-bot:Command('echo', function(msg,args,str,chat)
-	msg:Remove()
-	return str
-end)
+end, nil, nil, "Пинг бота")
+-- bot:Command('echo', function(msg,args,str,chat)
+-- 	msg:Remove()
+-- 	return str
+-- end)
 bot:Command('/status', function(msg,args,str,chat)
 	return string.format([[
 %s 🤙:
@@ -67,7 +70,7 @@ bot:Command('/status', function(msg,args,str,chat)
 
 ЗАЙТИ 👉 %s
 	]], GetHostName(), #player.GetAll(), game.MaxPlayers(), game.GetMap(), bot:GetClass(), game.GetIPAddress())
-end)
+end, nil, nil, "Информация о сервере")
 bot:Command('/cmd', function(msg,args,str,chat)
 	if(!isadmin(msg))then return "Вы не администратор." end
 
@@ -81,7 +84,7 @@ bot:Command('/cmd', function(msg,args,str,chat)
 return:
 %s -- soon enginespew
 	]], args[1], str, "- Нету"))
-end)
+end, isadmin, "<command> ... args", "Консольная команда")
 bot:Command('/lua', function(msg,args,str,chat)
 	if(!isadmin(msg))then return "Вы не администратор." end
 
@@ -93,7 +96,7 @@ bot:Command('/lua', function(msg,args,str,chat)
 
 %s
 	]], str))
-end)
+end, isadmin, "<code>", "LUARUN")
 
 bot:Command('/anonc', function(msg,args,str,chat)
 	if(!isadmin(msg))then return "Вы не администратор." end
@@ -114,7 +117,7 @@ bot:Command('/anonc', function(msg,args,str,chat)
 	end
 	bot:print('АНОНС ВСЕМ В СООБЩЕНИЯ:\n'.. str)
 	-- return 'Отправлено всем: '.. str
-end)
+end, isadmin, "<text>", "Текст во все беседы бота")
 
 function bot:GetVKUser(id,p,func)
 	if isfunction(p) then func=p end

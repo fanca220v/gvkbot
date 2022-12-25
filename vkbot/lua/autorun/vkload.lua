@@ -18,7 +18,7 @@ function vkapi:print(...)
 	Msg('\n')
 end
 function vkapi:Include(file)
-	include('fvkbot/'.. file)
+	return include('fvkbot/'.. file)
 end
 function vkapi:IncludeFolder(fold,recurse)
 	local f,d = file.Find('fvkbot/'.. fold ..'/*', "LUA")
