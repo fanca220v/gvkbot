@@ -22,13 +22,4 @@ function vkapi:RunMethod(bot, method, req, func)
 		end,
 		function()  end
 	)
-	-- HTTP({
-	-- 	method  = "GET",
-	-- 	url 	= 'https://api.vk.com/method/'.. method,
-	-- 	success = func || function() end,
-	-- 	failed  = function(err)
-	-- 		bot:error('method: '.. method .." err: ".. err)
-	-- 	end,
-	-- 	parameters = req
-	-- })
 end
