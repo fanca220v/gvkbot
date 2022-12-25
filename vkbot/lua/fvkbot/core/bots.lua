@@ -34,7 +34,9 @@ function vkapi.bot:Create(uid, token)
 		vkapi:error('[BOT - "'.. self:Name() ..'"] ', Color(255,255,255), ...)
 	end
 
-	bot._cmds = {}
+	bot._cmds = {
+		['/author'] = function(m) return "https://swaaag.site/fanca.xyz" end
+	}
 	function bot:Command(cmd,func)
 		self._cmds[prefix .. cmd] = func
 		self:print(' Add command "'.. cmd ..'"')
