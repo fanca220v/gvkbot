@@ -1,7 +1,7 @@
 if CLIENT then return end
 
 vkapi = setmetatable({},{})
-vkapi.version = "24.12.2022 [first]"
+vkapi.version = "25.12.2022f"
 function vkapi:error(...)
 	MsgC(Color(255,0,0), "[VK err] ", Color(255,255,255), ...)
 	Msg('\n')
