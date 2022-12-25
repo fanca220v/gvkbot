@@ -7,8 +7,7 @@ function vkapi:GetMessage()
       self.readed[bot:GetClass()] = self.readed[bot:GetClass()]||{}
       if (bot._ispoll) then
          self:RunMethod(bot, 'messages.getConversations', {}, function(data,_,_,_,req)
-            if (!istable(data)) then vkapi:error(bot:GetClass() ..": ".. data) return end
-            data = data.response
+            data = istable(data) && data.response || false
             if (!istable(data)) then vkapi:error(bot:GetClass() ..": ".. data) return end
             self.chats[bot:GetClass()] = data.items
             for k,v in pairs(data.items||{}) do
