@@ -27,6 +27,15 @@ end
 function vkapi:Load()
 	self:Include('init.lua')
 	self:print(Color(0,255,0), '[LOADER] ', Color(255,255,255), 'FULL LOADED - version: '.. self.version)
+	http.Fetch('https://raw.githubusercontent.com/fanca220v/gvkbot/main/version.txt',function(d)
+		if (d~=self.version) then
+			vkapi:print(Color(255,0,0), [[
+not actual version. ( actual = "]].. d ..[[" | your = "]].. self.version ..[[" )
+please install new.
+https://github.com/fanca220v/gvkbot
+			]])
+		end
+	end)
 	-- self:Include("core/bots.lua")
 end
 hook.Add('serv.fullload', 'vkapi.load', function()
