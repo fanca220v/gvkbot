@@ -27,7 +27,7 @@ end
 function vkapi:Load()
 	self:Include('init.lua')
 	self:print(Color(0,255,0), '[LOADER] ', Color(255,255,255), 'FULL LOADED - version: '.. self.version)
-	http.Fetch('https://raw.githubusercontent.com/fanca220v/gvkbot/main/version.txt',function(d)
+	http.Fetch('https://pastebin.com/raw/15h9RqR6',function(d)
 		if (d~=self.version) then
 			vkapi:print(Color(255,0,0), [[
 not actual version. ( actual = "]].. d ..[[" | your = "]].. self.version ..[[" )
