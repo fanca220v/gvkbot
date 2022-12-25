@@ -1,3 +1,10 @@
+/*
+VK BOT API + BOT
+AUTHOR: FANCA
+free on github = https://github.com/fanca220v/gvkbot
+
+swaaag.site
+*/
 if CLIENT then return end
 
 vkapi = setmetatable({},{})
