@@ -6,7 +6,7 @@ function vkapi:RunMethod(bot, method, req, func)
 
 	local req_str = ""
 	for k,v in pairs(req) do
-		v = string.Replace(v, ' ', "%20")
+		-- v = string.Replace(v, ' ', "%20")
 		req_str = req_str .."&".. k .."=".. v
 	end
 
@@ -22,4 +22,13 @@ function vkapi:RunMethod(bot, method, req, func)
 		end,
 		function()  end
 	)
+	-- HTTP({
+	-- 	method  = "GET",
+	-- 	url 	= 'https://api.vk.com/method/'.. method,
+	-- 	success = func || function() end,
+	-- 	failed  = function(err)
+	-- 		bot:error('method: '.. method .." err: ".. err)
+	-- 	end,
+	-- 	parameters = req
+	-- })
 end

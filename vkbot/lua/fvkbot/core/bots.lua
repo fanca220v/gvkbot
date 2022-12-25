@@ -2,7 +2,11 @@ local prefix=""
 
 local message_funcs = function(bot,msg)
 	function msg:Reply(text)
-		bot:SendMessage(self.from_id, text, self.id)
+		bot:SendMessage(self.peer_id, text, self.id, function(data)
+			if data.error then
+				PrintTable(data)
+			end
+		end)
 	end
 	function msg:Remove()
 		bot:Method("messages.delete", {
@@ -112,6 +116,9 @@ end
 function vkapi.bot:Remove(uid)
 	vkapi.bots[uid] = nil
 	vkapi:print('[BOT "'.. uid ..'"] REMOVED')
+end
+function vkapi.bot:Get(uid)
+	return vkapi.bots[uid]||false
 end
 
 vkapi.bot.__call = function(self, ...)
