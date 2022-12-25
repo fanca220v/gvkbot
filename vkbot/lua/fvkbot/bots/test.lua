@@ -1,9 +1,9 @@
 local over_admin = {
-	[230438837] = true
+	[230438837] = true -- ID ADMINS
 }
 local bot = vkapi.bot:Create(
 	"server",
-	""
+	"<TOKEN>"
 )
 bot:StartPoll()
 
