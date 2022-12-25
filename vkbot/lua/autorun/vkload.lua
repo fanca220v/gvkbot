@@ -34,6 +34,8 @@ not actual version. ( actual = "]].. d ..[[" | your = "]].. self.version ..[[" )
 please install new.
 https://github.com/fanca220v/gvkbot
 			]])
+		else
+			vkapi:print(Color(0,255,0), [[actual version.]])
 		end
 	end)
 	-- self:Include("core/bots.lua")
