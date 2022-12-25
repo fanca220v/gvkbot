@@ -8,8 +8,7 @@ VK Bot Api for garry's mod
 
 # Инструкция:
 1. Закинуть "vkbot" в addons
-2. Создать файл бота в "vkbot\lua\fvkbot\bots"
-   Либо открыть файл бота "vkbot\lua\fvkbot\bots\test.lua"
+2. Создать файл бота в "vkbot\lua\fvkbot\bots" / Либо открыть файл бота "vkbot\lua\fvkbot\bots\server.lua"
 3. Заходим в файл бота и ставим ваш токен группы вк.
 4. Готово.
 
