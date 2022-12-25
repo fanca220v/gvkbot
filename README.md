@@ -12,3 +12,5 @@ VK Bot Api for garry's mod
    Либо открыть файл бота "vkbot\lua\fvkbot\bots\test.lua"
 3. Заходим в файл бота и ставим ваш токен группы вк.
 4. Готово.
+
+[id]: Pw2RiJWoBu.png "Пример"
