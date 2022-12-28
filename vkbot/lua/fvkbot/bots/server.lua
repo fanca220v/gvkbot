@@ -69,7 +69,23 @@ bot:Command('/status', function(msg,args,str,chat)
 🔥 Бот uid: %s
 
 ЗАЙТИ 👉 %s
-	]], GetHostName(), #player.GetAll(), game.MaxPlayers(), game.GetMap(), bot:GetClass(), game.GetIPAddress())
+		]], 
+		GetHostName(), 
+		#player.GetAll(), 
+		game.MaxPlayers(), 
+		game.GetMap(), 
+		bot:GetClass(), 
+		game.GetIPAddress()
+	),{
+		inline = true,
+		{
+			{
+				-- type = "open_link",
+				-- link = "https://swaaag.site/connect?ip=".. game.GetIPAddress(),
+				text = "Присоеденится"
+			}
+		}
+	}
 end, nil, nil, "Информация о сервере")
 bot:Command('/cmd', function(msg,args,str,chat)
 	if(!isadmin(msg))then return "Вы не администратор." end

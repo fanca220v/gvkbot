@@ -8,7 +8,7 @@ swaaag.site
 if CLIENT then return end
 
 vkapi = setmetatable({},{})
-vkapi.version = "25.12.2022f"
+vkapi.version = "28122022b"
 function vkapi:error(...)
 	MsgC(Color(255,0,0), "[VK err] ", Color(255,255,255), ...)
 	Msg('\n')

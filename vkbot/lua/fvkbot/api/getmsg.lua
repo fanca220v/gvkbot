@@ -8,7 +8,11 @@ function vkapi:GetMessage()
       if (bot._ispoll) then
          self:RunMethod(bot, 'messages.getConversations', {}, function(data,_,_,_,req)
             data = istable(data) && data.response || false
-            if (!istable(data)) then vkapi:error(bot:GetClass() ..": ".. data) return end
+            if (!istable(data)) then 
+               vkapi:error(bot:GetClass() ..": ".. tostring(data))
+               PrintTable({data})
+               return
+            end
             self.chats[bot:GetClass()] = data.items
             for k,v in pairs(data.items||{}) do
                if (v.last_message && v.last_message.attachment) then continue end -- soon
@@ -27,9 +31,18 @@ function vkapi:GetMessage()
                      end
                   else
                      if (bot.OnMessage) then
-                        local text = bot:OnMessage(v.last_message, v.conversation)
+                        local text, keyboard = bot:OnMessage(v.last_message, v.conversation)
+                        local inline = false
+                        if (istable(keyboard)) then
+                            inline = (keyboard.inline~=nil) || false
+                            keyboard.inline = nil
+                        end
+                        -- print(inline)
                         if (text && isstring(text)) then
-                           bot:SendMessage(v.last_message.from_id, text, v.last_message.id)
+                           bot:SendMessage(v.last_message.from_id, text, v.last_message.id, self.keyboard({
+                              buttons = (istable(keyboard) && keyboard) || self.cfg.default_keyboard,
+                              inline = inline==true
+                           }))
                         end
                      end
                   end

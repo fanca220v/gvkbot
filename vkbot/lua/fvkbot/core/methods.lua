@@ -57,7 +57,9 @@ vkapi.method = function(method, bot)
 	end
 	function met:Add(key, val)
 		self.request = self.request||{}
-		self.request[tostring(key)] = val
+		self.request[key] = val||""
+		-- print(key,val)
+		-- PrintTable({self.request[key]||{false}})
 		return met
 	end
 	function met:Run()

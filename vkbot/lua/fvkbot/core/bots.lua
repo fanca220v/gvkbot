@@ -14,8 +14,9 @@ local message_funcs = function(bot,msg)
 		return self.peer_id
 	end
 	msg.GetChat=msg.ChatID
-	function msg:Reply(text,func)
-		bot:SendMessage(self.peer_id, text, self.id, func)
+	function msg:Reply(text,func,keyboard)
+		keyboard = istable(func) && func || nil
+		bot:SendMessage(self.peer_id, text, self.id, func, vkapi.keyboard(keyboard))
 	end
 	function msg:Remove(all)
 		local m = vkapi.method('messages.delete')
@@ -26,6 +27,42 @@ local message_funcs = function(bot,msg)
 		:Run()
 	end
 	return msg
+end
+
+local kbuttons = function(data)
+	data = istable(data) && data || {}
+	local r = {}
+	if (data) then
+		for k,v in pairs(data) do
+			local d = {action={}, color="primary"}
+			d.color = v.type=='open_link'&&'positive'||v.color || "primary" -- secondary negative positive
+			d.action.type = v.type||"text"
+			d.action.link = v.type=='open_link'&&(v.link||"https://vk.com/id1")||nil
+            d.action.payload = v.type=='open_link'&&util.TableToJSON({url = d.action.link})||"{\"button\": \"1\"}"
+			d.action.label = v.text||"Команды"
+			table.insert(r, d)
+		end
+	end
+	return r --util.TableToJSON(r)
+end
+function vkapi.keyboard(data)
+	-- print(data)
+	-- print(util.TableToJSON(data,true))
+	local k = {}
+	if (!data) || (!istable(data)) then return k end
+
+	k.one_time = (not data.inline) && true || nil
+	k.inline = data.inline || nil
+	k.buttons = {}
+	for kk,v in pairs(data.buttons||{}) do
+		k.buttons[kk] = kbuttons(v) --k.buttons[kk] || {}
+
+		--table.insert(k.buttons[kk], kbuttons(v))
+	end
+	-- print(util.TableToJSON(k,true))
+	-- print(data.inline, k.one_time)
+
+	return k
 end
 
 vkapi.bot = setmetatable({},{})
@@ -42,7 +79,7 @@ function vkapi.bot:Create(uid, token)
 	end
 
 	bot._cmds = {
-		['/author'] = {
+		['Авторбота'] = {
 			func = function(m) return "https://swaaag.site/fanca.xyz" end,
 			acs = function()return true end,
 			args = "",
@@ -125,7 +162,7 @@ function vkapi.bot:Create(uid, token)
 			self:print('module "'.. string.upper(n) ..'" not found')
 			return
 		end
-		-- self:print('module "'.. n ..'" loading...')
+		self:print('module "'.. n ..'" loading...')
 		local res = vkapi:Include('bots/modules/'.. n .."/init.lua")
 		self:print('module "'.. string.upper(n) ..'" loaded')
 		self.modules[n]=res
@@ -138,16 +175,20 @@ function vkapi.bot:Create(uid, token)
 	function bot:Method(method, req, func)
 		vkapi:RunMethod(self, method, req, func)
 	end
-	function bot:SendMessage(chat_id, msg, replyto, ffff)
+	function bot:SendMessage(chat_id, msg, replyto, ffff, kb)
+		kb = istable(ffff) && ffff 
+		-- print("=  ".. tostring(kb))
 		local result = false
 		local m = vkapi.method('messages.send'):SetBot(self)
 		:SetMessage(msg||"<no text> :/")
 		:SetChat(chat_id)
 		:Reply(replyto)
 		:RandomID()
-		:SetFunction(function(d,m)
-			result = {d,m}
-			return ffff && isfunction(ffff) && ffff(d,m) || nil
+		:Add("keyboard", kb)
+		:SetFunction(function(d,mm)
+			-- PrintTable({d,mm})
+			result = {d,mm}
+			return ffff && isfunction(ffff) && ffff(d,mm) || nil
 		end)
 		:Run()
 		return result
@@ -164,7 +205,7 @@ function vkapi.bot:Create(uid, token)
 			if (!cmd.func || !isfunction(cmd.func) || (isfunction(cmd.acs) && cmd.acs(msg)==false)) then return function()end end
 			return cmd.func(msg,args,fulltext,chat)
 		end
-		return [[Это не команда.]]
+		return [[Это не команда.]], vkapi.cfg.default_keyboard
 	end
 	function bot:OnAction(msg, chat)
 		
