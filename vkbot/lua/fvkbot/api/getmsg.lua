@@ -16,7 +16,10 @@ function vkapi:GetMessage()
             self.chats[bot:GetClass()] = data.items
             for k,v in pairs(data.items||{}) do
                if (v.last_message && v.last_message.attachment) then continue end -- soon
-               if v.last_message && (!v.admin_author_id) && (os.time()-v.last_message.date)<(v.maxtime || 60) && (v.last_message.from_id>0) then
+               local isnew = v.last_message && (!v.admin_author_id) && (os.time()-v.last_message.date)<(v.maxtime || 60) && (v.last_message.from_id>0)
+               -- print(isnew==true)
+               -- PrintTable({isnew==true && v.last_message, isnew==true && v.conversation})
+               if isnew then
 
                   if (!v.last_message || self.readed[bot:GetClass()][v.last_message.id]) then 
                      -- vkapi:error(bot:GetClass() ..": ПОВТОР ПУШ СООБЩЕНИЯ")--, util.TableToJSON(data,true))
@@ -24,6 +27,7 @@ function vkapi:GetMessage()
                      return
                   end
 
+                  local type = self:MSGType(v)
                   local isaction = v.last_message.action || false
                   if (isaction) then
                      if (bot.OnAction) then
@@ -39,9 +43,9 @@ function vkapi:GetMessage()
                         end
                         -- print(inline)
                         if (text && isstring(text)) then
-                           bot:SendMessage(v.last_message.from_id, text, v.last_message.id, self.keyboard({
+                           bot:SendMessage(v.last_message.peer_id, text, v.last_message.id, self.keyboard({
                               buttons = (istable(keyboard) && keyboard) || self.cfg.default_keyboard,
-                              inline = inline==true
+                              inline = (type==VK_TYPE_CHAT) || inline==true
                            }))
                         end
                      end

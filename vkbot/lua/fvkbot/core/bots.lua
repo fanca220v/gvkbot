@@ -67,7 +67,7 @@ end
 
 vkapi.bot = setmetatable({},{})
 vkapi.bots = {}
-function vkapi.bot:Create(uid, token)
+function vkapi.bot:Create(uid, token, gid)
 	local bot = setmetatable({},{})
 	LOADING_BOT = bot
 	-------------------------------------
@@ -148,6 +148,14 @@ function vkapi.bot:Create(uid, token)
 		return (self._starttime || 0)
 	end
 
+	bot._groupid = gid || 0
+	function bot:SetGroupID(d)
+		bot._groupid = d
+	end
+	function bot:GetGroupID(d)
+		return bot._groupid
+	end
+
 	bot._token = token
 	function bot:GetToken()
 		return (self._token || "error")
@@ -205,7 +213,9 @@ function vkapi.bot:Create(uid, token)
 			if (!cmd.func || !isfunction(cmd.func) || (isfunction(cmd.acs) && cmd.acs(msg)==false)) then return function()end end
 			return cmd.func(msg,args,fulltext,chat)
 		end
-		return [[Это не команда.]], vkapi.cfg.default_keyboard
+		if vkapi:MSGType(chat)==VK_TYPE_MEMBER then
+			return [[Это не команда.]], vkapi.cfg.default_keyboard
+		end
 	end
 	function bot:OnAction(msg, chat)
 		

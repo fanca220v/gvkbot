@@ -3,7 +3,8 @@ local over_admin = {
 }
 local bot = vkapi.bot:Create(
 	"server", -- UID
-	"vk1.a.xxxxx" --TOKEN
+	"vk1.a.xxxxx", --TOKEN
+	195940135 -- group ID
 )
 bot:Start()
 local database = bot:Module('database')

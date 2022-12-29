@@ -32,3 +32,11 @@ function vkapi:RunMethod(bot, method, req, func, ffunc)
 		end
 	)
 end
+
+VK_TYPE_MEMBER 	= 0
+VK_TYPE_CHAT 	= 1
+function vkapi:MSGType(msg)
+	if (msg.conversation) && (msg.conversation.chat_settings) then return 1 end
+	if (msg) && (msg.chat_settings) then return 1 end
+	return 0
+end
