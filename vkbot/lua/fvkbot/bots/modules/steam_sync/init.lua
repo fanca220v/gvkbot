@@ -24,6 +24,7 @@ local steam = function(vkid, steamid, msg)
 				if (msg) then
 					msg:Reply(t)
 				end
+				vkapi:SendMLog(t)
 			end, vkid, steamid, os.time())
 		else
 			local t = vkid .." и ".. steamid .." уже синхронизированы."
@@ -31,7 +32,7 @@ local steam = function(vkid, steamid, msg)
 			if (msg) then
 				msg:Reply(t)
 			end
-			PrintTable(d)
+			-- PrintTable(d)
 		end
 	end, vkid, steamid)
 end
@@ -48,10 +49,12 @@ local setsteam = function(vkid, steamid, msg)
 		if (msg) then
 			msg:Reply(t)
 		end
+		vkapi:SendMLog(t)
 	end, vkid, steamid)
 end
 local get = function(vkorsid,func)
 	db.query('SELECT * FROM vk_sync WHERE id=%s OR steamid=%s', function(d)
+		PrintTable({d})
 		if func then func(d&&d[1]||false) end
 	end,vkorsid,vkorsid)
 end

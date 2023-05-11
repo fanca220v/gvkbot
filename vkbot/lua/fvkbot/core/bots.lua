@@ -79,12 +79,12 @@ function vkapi.bot:Create(uid, token, gid)
 	end
 
 	bot._cmds = {
-		['Авторбота'] = {
-			func = function(m) return "https://swaaag.site/fanca.xyz" end,
-			acs = function()return true end,
-			args = "",
-			desc = "Автор бота"
-		},
+		-- ['Авторбота'] = {
+		-- 	func = function(m) return "https://swaaag.site/fanca.xyz" end,
+		-- 	acs = function()return true end,
+		-- 	args = "",
+		-- 	desc = "Автор бота"
+		-- },
 		['Команды'] = {
 			func = function(m) 
 				local str = "👀 Команды:\n"
@@ -183,8 +183,13 @@ function vkapi.bot:Create(uid, token, gid)
 	function bot:Method(method, req, func)
 		vkapi:RunMethod(self, method, req, func)
 	end
+	function bot:EnableBypassAntiSpam(bool)
+		vkapi.bypassAntispam.active[self:GetToken()] = bool or true
+		self:print("set antispam bypass: ".. tostring(bool))
+	end
 	function bot:SendMessage(chat_id, msg, replyto, ffff, kb)
 		kb = istable(ffff) && ffff 
+
 		-- print("=  ".. tostring(kb))
 		local result = false
 		local m = vkapi.method('messages.send'):SetBot(self)
@@ -194,18 +199,18 @@ function vkapi.bot:Create(uid, token, gid)
 		:RandomID()
 		:Add("keyboard", kb)
 		:SetFunction(function(d,mm)
-			-- PrintTable({d,mm})
-			result = {d,mm}
-			return ffff && isfunction(ffff) && ffff(d,mm) || nil
+			if isfunction(ffff) then 
+				ffff(d,mm)
+			end
 		end)
 		:Run()
-		return result
 	end
 
 	function bot:OnMessage(msg, chat)
 		if hook.Run('vk.onmsg', self:GetClass(), msg, chat)==false then return end
 		local args = string.Explode(' ', msg.text)
 		local cmd = self._cmds[args[1]||""]
+		cmd = (cmd) or (string.find(args[1], "@") and self._cmds[args[2]||""])
 		if (cmd) then
 			local fulltext = string.sub(msg.text, string.len(args[1])+1)
 			table.remove(args, 1)
@@ -225,6 +230,7 @@ function vkapi.bot:Create(uid, token, gid)
 	vkapi.bots[uid] = bot
 	return bot
 end
+
 function vkapi.bot:Remove(uid)
 	vkapi.bots[uid] = nil
 	vkapi:print('[BOT "'.. uid ..'"] REMOVED')
@@ -236,3 +242,4 @@ end
 vkapi.bot.__call = function(self, ...)
 	self:Create(...)
 end
+vkapi.bot.__index = vkapi.bot.__call

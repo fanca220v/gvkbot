@@ -9,7 +9,7 @@ function vkapi:RunMethod(bot, method, req, func, ffunc)
 		-- v = string.Replace(v, ' ', "%20")
 		-- print(k,istable(v),v)
 		v = istable(v) && util.TableToJSON(v) || v
-		req_str = req_str .."&".. k .."=".. v
+		req_str = req_str .."&".. tostring(k) .."=".. tostring(v)
 	end
 
 	local request = method .. "?v=".. api_version .."".. req_str
