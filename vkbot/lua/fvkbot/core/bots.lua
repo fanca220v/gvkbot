@@ -79,12 +79,12 @@ function vkapi.bot:Create(uid, token, gid)
 	end
 
 	bot._cmds = {
-		-- ['Авторбота'] = {
-		-- 	func = function(m) return "https://swaaag.site/fanca.xyz" end,
-		-- 	acs = function()return true end,
-		-- 	args = "",
-		-- 	desc = "Автор бота"
-		-- },
+		['Авторбота'] = {
+			func = function(m) return "https://fanca.smrtcommunity.xyz" end,
+			acs = function()return true end,
+			args = "",
+			desc = "Автор бота"
+		},
 		['Команды'] = {
 			func = function(m) 
 				local str = "👀 Команды:\n"
