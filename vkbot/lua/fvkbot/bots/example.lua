@@ -7,7 +7,6 @@ local bot = vkapi.bot:Create(
 	192800689 -- group ID
 )
 bot:Start() -- start getting messages every 1 seconds
-bot:EnableBypassAntiSpam(--[[bool]]) -- enable bypass by antispam vk
 
 local database = bot:Module('database') -- Database query function[ sup darkrp db, darkrp, gmod sql(sv.db) ]
 local sync = bot:Module('steam_sync') -- steam sync for bot
