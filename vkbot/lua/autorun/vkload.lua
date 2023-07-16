@@ -3,7 +3,7 @@ VK BOT API + BOT
 AUTHOR: FANCA
 free on github = https://github.com/fanca220v/gvkbot
 
-swaaag.site
+fanca.smrtcommunity.xyz
 */
 if CLIENT then return end
 
