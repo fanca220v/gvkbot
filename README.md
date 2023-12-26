@@ -1,6 +1,5 @@
 ![VK](https://i.imgur.com/RMNGUV1.png) ![GMOD](https://upload.wikimedia.org/wikipedia/commons/3/34/Gmod_logo.png)
 # VK BOT API FOR GMOD
-VK Bot Api for garry's mod
 
 # Зачем
 Я не видел нормальный API для VK серверов Garry's Mod, а если и видел, то платные, решил сделать свой для всех.
